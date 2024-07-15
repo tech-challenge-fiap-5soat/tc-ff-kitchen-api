@@ -20,6 +20,7 @@ type OrderGateway interface {
 	FindAllByStatus(status valueobject.OrderStatus) ([]entity.Order, error)
 	Save(order *entity.Order) (string, error)
 	Update(order *entity.Order) error
+	ReleaseOrder(orderId string) error
 	FinishOrder(orderId string) error
 }
 
@@ -33,5 +34,6 @@ type OrderController interface {
 }
 
 type OrderApi interface {
+	ReleaseOrder(orderId string) error
 	FinishOrder(orderId string) error
 }

@@ -68,8 +68,13 @@ func setupConfig() *Config {
 		viper.SetConfigName("configs")
 		viper.SetConfigType("yaml")
 		viper.AddConfigPath(configFilePath)
+		viper.AddConfigPath("/home/hugofranciscofagundesdesouza/Projects/pos-graduacao/tc-ff-kitchen-api/src/external/api/infra/config")
 		viper.AddConfigPath("/app/data/configs")
 		err := viper.ReadInConfig()
+
+		//if err = viper.ReadInConfig(); err != nil {
+		//	panic(fmt.Errorf("Falha ao carregar as configurações: %w \n", err))
+		//}
 
 		if err != nil && !allConfigsAreSet() {
 			panic(fmt.Errorf("falha ao carregar as configurações: %w", err))
