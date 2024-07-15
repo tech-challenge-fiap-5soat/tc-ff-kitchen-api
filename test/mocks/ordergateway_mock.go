@@ -242,6 +242,52 @@ func (_c *MockOrderGateway_FinishOrder_Call) RunAndReturn(run func(string) error
 	return _c
 }
 
+// ReleaseOrder provides a mock function with given fields: orderId
+func (_m *MockOrderGateway) ReleaseOrder(orderId string) error {
+	ret := _m.Called(orderId)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ReleaseOrder")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(orderId)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockOrderGateway_ReleaseOrder_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ReleaseOrder'
+type MockOrderGateway_ReleaseOrder_Call struct {
+	*mock.Call
+}
+
+// ReleaseOrder is a helper method to define mock.On call
+//   - orderId string
+func (_e *MockOrderGateway_Expecter) ReleaseOrder(orderId interface{}) *MockOrderGateway_ReleaseOrder_Call {
+	return &MockOrderGateway_ReleaseOrder_Call{Call: _e.mock.On("ReleaseOrder", orderId)}
+}
+
+func (_c *MockOrderGateway_ReleaseOrder_Call) Run(run func(orderId string)) *MockOrderGateway_ReleaseOrder_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *MockOrderGateway_ReleaseOrder_Call) Return(_a0 error) *MockOrderGateway_ReleaseOrder_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockOrderGateway_ReleaseOrder_Call) RunAndReturn(run func(string) error) *MockOrderGateway_ReleaseOrder_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Save provides a mock function with given fields: order
 func (_m *MockOrderGateway) Save(order *entity.Order) (string, error) {
 	ret := _m.Called(order)

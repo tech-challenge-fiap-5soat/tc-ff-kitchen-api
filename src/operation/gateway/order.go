@@ -74,9 +74,6 @@ func (og *orderGateway) Save(order *entity.Order) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	fmt.Println(insertResult)
-
 	orderInserted := insertResult.(string)
 	return orderInserted, nil
 }
@@ -86,6 +83,29 @@ func (og *orderGateway) Update(order *entity.Order) error {
 		order.ID,
 		dto.OrderEntityToUpdateRecordDTO(order),
 	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (og *orderGateway) ReleaseOrder(orderId string) error {
+	order, err := og.FindById(orderId)
+
+	if err != nil {
+		return err
+	}
+
+	if order == nil {
+		return fmt.Errorf("order not found")
+	}
+
+	if order.OrderStatus != valueobject.READY_TO_TAKEOUT {
+		return fmt.Errorf("order cannot be released cause status is %s", order.OrderStatus.String())
+	}
+
+	err = og.orderApi.ReleaseOrder(orderId)
 
 	if err != nil {
 		return err

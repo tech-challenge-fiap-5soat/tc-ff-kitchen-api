@@ -145,7 +145,11 @@ func (o *orderUseCase) UpdateOrderStatus(orderId string, status orderStatus.Orde
 		return err
 	}
 
-	if order.OrderStatus.OrderIsCompleted() {
+	if order.OrderStatus.OrderIsReadyToTakeout(status) {
+		o.gateway.ReleaseOrder(orderId)
+	}
+
+	if order.OrderStatus.OrderIsCompleted(status) {
 		o.gateway.FinishOrder(orderId)
 	}
 

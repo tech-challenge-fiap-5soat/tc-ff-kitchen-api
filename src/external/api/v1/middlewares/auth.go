@@ -16,29 +16,6 @@ func CheckAccessToken(allowedRoutes ...string) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		c.Next()
-		// if allowed[c.Request.URL.Path] {
-		// 	c.Next()
-		// 	return
-		// }
-
-		// authorizationHeader := c.GetHeader("Authorization")
-		// if authorizationHeader == "" {
-		// 	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is missing"})
-		// 	return
-		// }
-
-		// tokenParts := strings.Split(authorizationHeader, " ")
-		// if len(tokenParts) != 2 || strings.ToLower(tokenParts[0]) != "bearer" {
-		// 	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Malformed token"})
-		// 	return
-		// }
-
-		// accessToken := tokenParts[1]
-		// if !validateAccessToken(accessToken) {
-		// 	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid access token"})
-		// 	return
-		// }
-		c.Next()
 	}
 }
 

@@ -26,105 +26,21 @@ func NewOrderHandler(gRouter *gin.RouterGroup, interactor interfaces.OrderContro
 		interactor: interactor,
 	}
 
-	gRouter.GET("/order", handler.FindAllHandler)
-	gRouter.GET("/order/:id", handler.FindByIdHandler)
-	gRouter.GET("/order/status/:status", handler.GetAllByStatusHandler)
-	gRouter.POST("/order", handler.CreateOrderHandler)
+	gRouter.POST("/prepare-order", handler.PrepareOrderHandler)
 	gRouter.PUT("/order/:id", handler.UpdateOrderHandler)
 	gRouter.PUT("/order/:id/status/:status", handler.UpdateStatusOrderHandler)
 }
 
-// Get All Orders godoc
-// @Summary Get all orders
-// @Description Get all orders
-// @Tags Order Routes
-// @Accept  json
-// @Produce  json
-// @Success 200 {array} entity.Order{}
-// @Router /api/v1/order [get]
-func (handler *orderHandler) FindAllHandler(c *gin.Context) {
-	orders, err := handler.interactor.FindAll()
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, orders)
-}
-
-// Get Order godoc
-// @Summary Get order by ID
-// @Description Get order by ID
-// @Tags Order Routes
-// @Param        id   path      string  true  "Order ID"
-// @Accept  json
-// @Produce  json
-// @Success 200 {object} entity.Order{}
-// @Router /api/v1/order/{id} [get]
-func (handler *orderHandler) FindByIdHandler(c *gin.Context) {
-	orderId, exists := c.Params.Get("id")
-	var order *entity.Order // Only to swaggo doc
-
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "order id is required"})
-		return
-	}
-
-	result, err := handler.interactor.FindById(orderId)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	order = result
-
-	c.JSON(http.StatusOK, order)
-}
-
-// Get All Orders by Status godoc
-// @Summary Get all orders by status
-// @Description Get all orders by status
-// @Tags Order Routes
-// @Param        status   path      string  true  "STARTED, PAYMENT_PENDING, PAYMENT_APPROVED, PAYMENT_REFUSED, PREPARING, READY or COMPLETED"
-// @Accept  json
-// @Produce  json
-// @Success 200 {array} entity.Order{}
-// @Router /api/v1/order/status/{status} [get]
-func (handler *orderHandler) GetAllByStatusHandler(c *gin.Context) {
-	status, exists := c.Params.Get("status")
-
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "status is required"})
-		return
-	}
-
-	orderSts, err := orderStatus.ParseOrderStatus(status)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid status"})
-		return
-	}
-
-	orders, err := handler.interactor.GetAllByStatus(orderSts)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, orders)
-}
-
 // Create Order godoc
-// @Summary Create new order
-// @Description Create new order
+// @Summary Prepare new order
+// @Description Prepare new order
 // @Tags Order Routes
 // @Param        data   body      dto.OrderCreateDTO  true  "Order information and customer CPF"
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} interface{}
 // @Router /api/v1/order [post]
-func (handler *orderHandler) CreateOrderHandler(c *gin.Context) {
+func (handler *orderHandler) PrepareOrderHandler(c *gin.Context) {
 	var order entity.Order
 
 	if err := c.ShouldBindJSON(&order); err != nil {
