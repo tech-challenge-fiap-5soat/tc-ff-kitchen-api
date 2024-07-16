@@ -146,11 +146,17 @@ func (o *orderUseCase) UpdateOrderStatus(orderId string, status orderStatus.Orde
 	}
 
 	if order.OrderStatus.OrderIsReadyToTakeout(status) {
-		o.gateway.ReleaseOrder(orderId)
+		err = o.gateway.ReleaseOrder(orderId)
+		if err != nil {
+			return err
+		}
 	}
 
 	if order.OrderStatus.OrderIsCompleted(status) {
-		o.gateway.FinishOrder(orderId)
+		err = o.gateway.FinishOrder(orderId)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
