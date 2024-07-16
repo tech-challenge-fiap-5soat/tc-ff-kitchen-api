@@ -20,6 +20,7 @@ func TestOrderUseCase(t *testing.T) {
 	t.Parallel()
 
 	t.Run("should return order by given id", func(t *testing.T) {
+
 		expectedOrder := &entity.Order{ID: "123"}
 
 		orderGatewayMock = mocks.NewMockOrderGateway(t)

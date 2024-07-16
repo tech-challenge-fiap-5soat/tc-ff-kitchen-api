@@ -19,8 +19,8 @@ func (cpf CPF) IsValid() bool {
 		"55555555555",
 		"66666666666",
 		"77777777777",
-		"88888888888",
 		"99999999999",
+		"88888888888",
 	}
 
 	if slices.Contains(blockList, string(cpf)) {

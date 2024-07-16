@@ -30,7 +30,7 @@ jobs:
       run: mkdir -p coverage  
 
     - name: Run tests
-      run: go mod tidy && go test ./... -coverprofile=coverage/coverage.out
+      run: go mod tidy && go test ./... -v -coverpkg=./... -coverprofile=coverage/coverage.out -json ./... > coverage/test.out
       
     - name: Upload coverage report
       uses: actions/upload-artifact@v3
@@ -67,8 +67,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      # with:
-      #   args: >
-      #     -Dsonar.organization=tech-challenge-fiap-5soat
-      #     -Dsonar.projectKey=tech-challenge-fiap-5soat_tc-ff-kitchen-api
-      #     -Dsonar.go.coverage.reportPaths=coverage/coverage.out
+      with:
+        args: >
+          -Dsonar.organization=tech-challenge-fiap-5soat
+          -Dsonar.projectKey=tech-challenge-fiap-5soat_tc-ff-kitchen-api
+          -Dsonar.go.coverage.reportPaths=coverage/coverage.out
+          -Dsonar.go.tests.reportPaths=/github/workspace/coverage/test.out

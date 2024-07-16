@@ -87,10 +87,10 @@ func (o OrderStatus) OrderCanBeUpdated() bool {
 	return o == AWAITING_PREPARATION
 }
 
-func (o OrderStatus) OrderIsReadyToTakeout(status OrderStatus) bool {
-	return status == READY_TO_TAKEOUT
-}
-
 func (o OrderStatus) OrderIsCompleted(status OrderStatus) bool {
 	return status == COMPLETED
+}
+
+func (o OrderStatus) OrderIsReadyToTakeout(status OrderStatus) bool {
+	return status == READY_TO_TAKEOUT
 }

@@ -11,8 +11,8 @@ func (category Category) IsValid() bool {
 	categoryList := []string{
 		"acompanhamento",
 		"bebida",
-		"lanche",
 		"sobremesa",
+		"lanche",
 	}
 
 	return slices.Contains(categoryList, strings.ToLower(string(category)))
