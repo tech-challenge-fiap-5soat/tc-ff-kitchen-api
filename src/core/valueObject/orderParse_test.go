@@ -1,4 +1,4 @@
-package valueobject
+package valueobject_test
 
 import (
 	"testing"
@@ -8,6 +8,7 @@ import (
 )
 
 func TestParseOrderStatus(t *testing.T) {
+
 	testCases := []struct {
 		name     string
 		input    string

@@ -1,4 +1,4 @@
-package valueobject
+package valueobject_test
 
 import (
 	"strconv"
@@ -12,6 +12,7 @@ import (
 
 func TestCPF(t *testing.T) {
 	t.Run("should return true when cpf is valid", func(t *testing.T) {
+
 		cpf := CPF("19119119100")
 
 		assert.True(t, cpf.IsValid())
