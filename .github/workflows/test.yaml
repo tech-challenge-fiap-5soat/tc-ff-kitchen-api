@@ -30,7 +30,7 @@ jobs:
       run: mkdir -p coverage  
 
     - name: Run tests
-      run: go mod tidy && go test ./... -v -coverpkg=./... -coverprofile=coverage.out -json ./... > test.out
+      run: go mod tidy && go test ./... -v -coverpkg=./... -coverprofile=coverage/coverage.out -json ./... > coverage/test.out
       
     - name: Upload coverage report
       uses: actions/upload-artifact@v3
