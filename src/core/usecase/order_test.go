@@ -10,6 +10,7 @@ import (
 	valueobject "github.com/tech-challenge-fiap-5soat/tc-ff-kitchen-api/src/core/valueObject"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/tech-challenge-fiap-5soat/tc-ff-kitchen-api/test/mocks"
 )
 
@@ -234,5 +235,113 @@ func TestOrderUseCase(t *testing.T) {
 		assert.True(t, resultOrders[0].CreatedAt.Before(resultOrders[1].CreatedAt.Time))
 		assert.True(t, resultOrders[1].CreatedAt.Before(resultOrders[2].CreatedAt.Time))
 		assert.True(t, resultOrders[2].CreatedAt.Before(resultOrders[3].CreatedAt.Time))
+	})
+}
+
+func TestUpdateOrder(t *testing.T) {
+	t.Run("should update order successfully", func(t *testing.T) {
+		orderGatewayMock := mocks.NewMockOrderGateway(t)
+		orderUseCase := usecase.NewOrderUseCase(orderGatewayMock)
+
+		orderID := "123"
+		existentOrder := &entity.Order{
+			ID:          orderID,
+			OrderStatus: valueobject.AWAITING_PREPARATION,
+			OrderItems:  []entity.OrderItem{},
+			Amount:      0,
+		}
+		orderToUpdate := entity.Order{
+			ID:          orderID,
+			OrderStatus: valueobject.PREPARING,
+			OrderItems:  []entity.OrderItem{},
+			Amount:      0,
+		}
+
+		orderGatewayMock.On("FindById", orderID).Return(existentOrder, nil)
+		orderGatewayMock.On("Update", mock.AnythingOfType("*entity.Order")).Return(nil)
+
+		err := orderUseCase.UpdateOrder(orderID, orderToUpdate)
+
+		assert.NoError(t, err)
+		orderGatewayMock.AssertCalled(t, "FindById", orderID)
+		orderGatewayMock.AssertNumberOfCalls(t, "Update", 1)
+	})
+
+	t.Run("should return error when order is not found", func(t *testing.T) {
+		orderGatewayMock := mocks.NewMockOrderGateway(t)
+		orderUseCase := usecase.NewOrderUseCase(orderGatewayMock)
+		orderID := "123"
+		orderToUpdate := entity.Order{
+			ID:          orderID,
+			OrderStatus: valueobject.PREPARING,
+			OrderItems:  []entity.OrderItem{},
+			Amount:      0,
+		}
+
+		orderGatewayMock.On("FindById", orderID).Return(nil, errors.New("order not found"))
+
+		err := orderUseCase.UpdateOrder(orderID, orderToUpdate)
+
+		assert.Error(t, err)
+		orderGatewayMock.AssertCalled(t, "FindById", orderID)
+		orderGatewayMock.AssertNotCalled(t, "Update")
+	})
+
+	t.Run("should return error when order status cannot be updated", func(t *testing.T) {
+		orderGatewayMock := mocks.NewMockOrderGateway(t)
+		orderUseCase := usecase.NewOrderUseCase(orderGatewayMock)
+		orderID := "123"
+		existentOrder := &entity.Order{
+			ID:          orderID,
+			OrderStatus: valueobject.READY_TO_TAKEOUT,
+			OrderItems:  []entity.OrderItem{},
+			Amount:      0,
+		}
+		orderToUpdate := entity.Order{
+			ID:          orderID,
+			OrderStatus: valueobject.PREPARING,
+			OrderItems:  []entity.OrderItem{},
+			Amount:      0,
+		}
+
+		orderGatewayMock.On("FindById", orderID).Return(existentOrder, nil)
+
+		err := orderUseCase.UpdateOrder(orderID, orderToUpdate)
+
+		assert.Error(t, err)
+		assert.EqualError(t, err, "order cannot be updated cause status is READY_TO_TAKEOUT")
+		orderGatewayMock.AssertCalled(t, "FindById", orderID)
+		orderGatewayMock.AssertNotCalled(t, "Update")
+	})
+
+	t.Run("should return error when order gateway update fails", func(t *testing.T) {
+		orderGatewayMock := mocks.NewMockOrderGateway(t)
+		orderUseCase := usecase.NewOrderUseCase(orderGatewayMock)
+		orderID := "123"
+		existentOrder := &entity.Order{
+			ID:          orderID,
+			OrderStatus: valueobject.AWAITING_PREPARATION,
+			OrderItems:  []entity.OrderItem{},
+			CreatedAt:   valueobject.CustomTime{},
+			UpdatedAt:   valueobject.CustomTime{},
+			Amount:      0,
+		}
+		orderToUpdate := entity.Order{
+			ID:          orderID,
+			OrderStatus: valueobject.PREPARING,
+			OrderItems:  []entity.OrderItem{},
+			CreatedAt:   valueobject.CustomTime{},
+			UpdatedAt:   valueobject.CustomTime{},
+			Amount:      0,
+		}
+
+		orderGatewayMock.On("FindById", orderID).Return(existentOrder, nil)
+		orderGatewayMock.On("Update", existentOrder).Return(errors.New("update failed"))
+
+		err := orderUseCase.UpdateOrder(orderID, orderToUpdate)
+
+		assert.Error(t, err)
+		assert.EqualError(t, err, "update failed")
+		orderGatewayMock.AssertCalled(t, "FindById", orderID)
 	})
 }
