@@ -1,4 +1,4 @@
-package usecase
+package usecase_test
 
 import (
 	"errors"
@@ -16,7 +16,7 @@ import (
 var orderGatewayMock *mocks.MockOrderGateway
 
 func TestOrderUseCase(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 
 	t.Run("should return order by given id", func(t *testing.T) {
 		expectedOrder := &entity.Order{ID: "123"}

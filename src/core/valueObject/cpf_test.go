@@ -1,4 +1,4 @@
-package valueobject
+package valueobject_test
 
 import (
 	"strconv"
