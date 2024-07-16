@@ -14,6 +14,7 @@ func TestCategory(t *testing.T) {
 
 		assert.True(t, isValid)
 	})
+
 	t.Run("should return true when category is Bebida", func(t *testing.T) {
 		isValid := vo.Category("Bebida").IsValid()
 

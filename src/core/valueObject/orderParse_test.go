@@ -120,7 +120,6 @@ func TestIsValidNextStatus(t *testing.T) {
 
 		assert.False(t, result)
 	})
-
 }
 
 func TestOrderStatusAsString(t *testing.T) {
