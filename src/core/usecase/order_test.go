@@ -345,3 +345,217 @@ func TestUpdateOrder(t *testing.T) {
 		orderGatewayMock.AssertCalled(t, "FindById", orderID)
 	})
 }
+func TestUpdateOrderStatus(t *testing.T) {
+	t.Run("should update order status successfully", func(t *testing.T) {
+		orderGatewayMock := mocks.NewMockOrderGateway(t)
+		orderUseCase := usecase.NewOrderUseCase(orderGatewayMock)
+
+		orderID := "123"
+		existentOrder := &entity.Order{
+			ID:          orderID,
+			OrderStatus: valueobject.PREPARING,
+			OrderItems:  []entity.OrderItem{},
+			Amount:      0,
+		}
+		newStatus := valueobject.READY_TO_TAKEOUT
+
+		orderGatewayMock.On("FindById", orderID).Return(existentOrder, nil)
+		orderGatewayMock.On("Update", mock.AnythingOfType("*entity.Order")).Return(nil)
+		orderGatewayMock.On("ReleaseOrder", orderID).Return(nil)
+
+		err := orderUseCase.UpdateOrderStatus(orderID, newStatus)
+
+		assert.NoError(t, err)
+		orderGatewayMock.AssertCalled(t, "FindById", orderID)
+		orderGatewayMock.AssertCalled(t, "Update", mock.AnythingOfType("*entity.Order"))
+		orderGatewayMock.AssertCalled(t, "ReleaseOrder", orderID)
+	})
+
+	t.Run("should return error when order is not found", func(t *testing.T) {
+		orderGatewayMock := mocks.NewMockOrderGateway(t)
+		orderUseCase := usecase.NewOrderUseCase(orderGatewayMock)
+		orderID := "123"
+		newStatus := valueobject.READY_TO_TAKEOUT
+
+		orderGatewayMock.On("FindById", orderID).Return(nil, errors.New("order not found"))
+
+		err := orderUseCase.UpdateOrderStatus(orderID, newStatus)
+
+		assert.Error(t, err)
+		orderGatewayMock.AssertCalled(t, "FindById", orderID)
+		orderGatewayMock.AssertNotCalled(t, "Update", mock.AnythingOfType("*entity.Order"))
+		orderGatewayMock.AssertNotCalled(t, "ReleaseOrder", orderID)
+	})
+
+	t.Run("should return error when updating to previous status", func(t *testing.T) {
+		orderGatewayMock := mocks.NewMockOrderGateway(t)
+		orderUseCase := usecase.NewOrderUseCase(orderGatewayMock)
+		orderID := "123"
+		existentOrder := &entity.Order{
+			ID:          orderID,
+			OrderStatus: valueobject.PREPARING,
+			OrderItems:  []entity.OrderItem{},
+			Amount:      0,
+		}
+		newStatus := valueobject.AWAITING_PREPARATION
+
+		orderGatewayMock.On("FindById", orderID).Return(existentOrder, nil)
+
+		err := orderUseCase.UpdateOrderStatus(orderID, newStatus)
+
+		assert.Error(t, err)
+		orderGatewayMock.AssertCalled(t, "FindById", orderID)
+		orderGatewayMock.AssertNotCalled(t, "Update", mock.AnythingOfType("*entity.Order"))
+		orderGatewayMock.AssertNotCalled(t, "ReleaseOrder", orderID)
+	})
+
+	t.Run("should return error when updating to invalid next status", func(t *testing.T) {
+		orderGatewayMock := mocks.NewMockOrderGateway(t)
+		orderUseCase := usecase.NewOrderUseCase(orderGatewayMock)
+		orderID := "123"
+		existentOrder := &entity.Order{
+			ID:          orderID,
+			OrderStatus: valueobject.PREPARING,
+			OrderItems:  []entity.OrderItem{},
+			Amount:      0,
+		}
+		newStatus := valueobject.COMPLETED
+
+		orderGatewayMock.On("FindById", orderID).Return(existentOrder, nil)
+
+		err := orderUseCase.UpdateOrderStatus(orderID, newStatus)
+
+		assert.Error(t, err)
+		orderGatewayMock.AssertCalled(t, "FindById", orderID)
+		orderGatewayMock.AssertNotCalled(t, "Update", mock.AnythingOfType("*entity.Order"))
+		orderGatewayMock.AssertNotCalled(t, "ReleaseOrder", orderID)
+	})
+
+	t.Run("should handle error when updating order status", func(t *testing.T) {
+		orderGatewayMock := mocks.NewMockOrderGateway(t)
+		orderUseCase := usecase.NewOrderUseCase(orderGatewayMock)
+		orderID := "123"
+		existentOrder := &entity.Order{
+			ID:          orderID,
+			OrderStatus: valueobject.PREPARING,
+			OrderItems:  []entity.OrderItem{},
+			Amount:      0,
+		}
+		newStatus := valueobject.READY_TO_TAKEOUT
+
+		orderGatewayMock.On("FindById", orderID).Return(existentOrder, nil)
+		orderGatewayMock.On("Update", mock.AnythingOfType("*entity.Order")).Return(errors.New("update error"))
+
+		err := orderUseCase.UpdateOrderStatus(orderID, newStatus)
+
+		assert.Error(t, err)
+		orderGatewayMock.AssertCalled(t, "FindById", orderID)
+		orderGatewayMock.AssertCalled(t, "Update", mock.AnythingOfType("*entity.Order"))
+		orderGatewayMock.AssertNotCalled(t, "ReleaseOrder", orderID)
+	})
+
+	t.Run("should handle error when releasing order", func(t *testing.T) {
+		orderGatewayMock := mocks.NewMockOrderGateway(t)
+		orderUseCase := usecase.NewOrderUseCase(orderGatewayMock)
+
+		orderID := "123"
+		existentOrder := &entity.Order{
+			ID:          orderID,
+			OrderStatus: valueobject.PREPARING,
+			OrderItems:  []entity.OrderItem{},
+			Amount:      0,
+		}
+		newStatus := valueobject.READY_TO_TAKEOUT
+
+		orderGatewayMock.On("FindById", orderID).Return(existentOrder, nil)
+		orderGatewayMock.On("Update", mock.AnythingOfType("*entity.Order")).Return(nil)
+		orderGatewayMock.On("ReleaseOrder", orderID).Return(errors.New("release error"))
+
+		err := orderUseCase.UpdateOrderStatus(orderID, newStatus)
+
+		assert.Error(t, err)
+		orderGatewayMock.AssertCalled(t, "FindById", orderID)
+		orderGatewayMock.AssertCalled(t, "Update", mock.AnythingOfType("*entity.Order"))
+		orderGatewayMock.AssertCalled(t, "ReleaseOrder", orderID)
+	})
+
+	t.Run("should update order status successfully", func(t *testing.T) {
+		orderGatewayMock := mocks.NewMockOrderGateway(t)
+		orderUseCase := usecase.NewOrderUseCase(orderGatewayMock)
+
+		orderID := "123"
+		existentOrder := &entity.Order{
+			ID:          orderID,
+			OrderStatus: valueobject.AWAITING_PREPARATION,
+			OrderItems:  []entity.OrderItem{},
+			Amount:      0,
+		}
+		newStatus := valueobject.PREPARING
+
+		orderGatewayMock.On("FindById", orderID).Return(existentOrder, nil)
+		orderGatewayMock.On("Update", mock.AnythingOfType("*entity.Order")).Return(nil)
+
+		err := orderUseCase.UpdateOrderStatus(orderID, newStatus)
+
+		assert.NoError(t, err)
+		orderGatewayMock.AssertCalled(t, "FindById", orderID)
+		orderGatewayMock.AssertNumberOfCalls(t, "Update", 1)
+	})
+
+	t.Run("should return error when order is not found", func(t *testing.T) {
+		orderGatewayMock := mocks.NewMockOrderGateway(t)
+		orderUseCase := usecase.NewOrderUseCase(orderGatewayMock)
+		orderID := "123"
+
+		orderGatewayMock.On("FindById", orderID).Return(nil, errors.New("order not found"))
+
+		err := orderUseCase.UpdateOrderStatus(orderID, valueobject.PREPARING)
+
+		assert.Error(t, err)
+		orderGatewayMock.AssertCalled(t, "FindById", orderID)
+		orderGatewayMock.AssertNotCalled(t, "Update")
+	})
+
+	t.Run("should return error when order status cannot be updated", func(t *testing.T) {
+		orderGatewayMock := mocks.NewMockOrderGateway(t)
+		orderUseCase := usecase.NewOrderUseCase(orderGatewayMock)
+		orderID := "123"
+		existentOrder := &entity.Order{
+			ID:          orderID,
+			OrderStatus: valueobject.COMPLETED,
+			OrderItems:  []entity.OrderItem{},
+			Amount:      0,
+		}
+		newStatus := valueobject.PREPARING
+
+		orderGatewayMock.On("FindById", orderID).Return(existentOrder, nil)
+
+		err := orderUseCase.UpdateOrderStatus(orderID, newStatus)
+
+		assert.Error(t, err)
+		orderGatewayMock.AssertCalled(t, "FindById", orderID)
+		orderGatewayMock.AssertNotCalled(t, "Update")
+	})
+
+}
+
+func TestCreateOrder(t *testing.T) {
+	orderGatewayMock := mocks.NewMockOrderGateway(t)
+	orderUseCase := usecase.NewOrderUseCase(orderGatewayMock)
+
+	order := entity.Order{
+		ID:          "123",
+		OrderStatus: valueobject.AWAITING_PREPARATION,
+		OrderItems:  []entity.OrderItem{},
+		Amount:      0,
+		Customer:    entity.Customer{},
+	}
+
+	orderGatewayMock.On("Save", mock.AnythingOfType("*entity.Order")).Return("123", nil)
+
+	orderID, err := orderUseCase.CreateOrder(order)
+
+	assert.NoError(t, err)
+	assert.Equal(t, "123", orderID)
+	orderGatewayMock.AssertCalled(t, "Save", &order)
+}
