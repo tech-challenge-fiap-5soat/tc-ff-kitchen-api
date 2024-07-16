@@ -88,7 +88,6 @@ func (o *orderUseCase) CreateOrder(order entity.Order) (string, error) {
 
 func (o *orderUseCase) UpdateOrder(orderId string, order entity.Order) error {
 	existentOrder, err := o.FindById(orderId)
-
 	if err != nil {
 		return err
 	}
