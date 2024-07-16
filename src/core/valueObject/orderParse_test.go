@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	orderStatus "github.com/tech-challenge-fiap-5soat/tc-ff-kitchen-api/src/core/valueObject"
+	valueobject "github.com/tech-challenge-fiap-5soat/tc-ff-kitchen-api/src/core/valueObject"
 )
 
 func TestParseOrderStatus(t *testing.T) {
@@ -12,19 +12,19 @@ func TestParseOrderStatus(t *testing.T) {
 	testCases := []struct {
 		name     string
 		input    string
-		expected orderStatus.OrderStatus
+		expected valueobject.OrderStatus
 		err      bool
 	}{
 		{
 			name:     "Valid order status",
 			input:    "PREPARING",
-			expected: orderStatus.PREPARING,
+			expected: valueobject.PREPARING,
 			err:      false,
 		},
 		{
 			name:     "Valid order status with lower case",
 			input:    "preparing",
-			expected: orderStatus.PREPARING,
+			expected: valueobject.PREPARING,
 			err:      false,
 		},
 		{
@@ -37,7 +37,7 @@ func TestParseOrderStatus(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			o, err := orderStatus.ParseOrderStatus(tc.input)
+			o, err := valueobject.ParseOrderStatus(tc.input)
 
 			if tc.err && err == nil {
 				t.Errorf("expected error but got none")
@@ -54,8 +54,77 @@ func TestParseOrderStatus(t *testing.T) {
 	}
 }
 
+func TestGetPreviousStatus(t *testing.T) {
+	t.Run("should return previous status for PREPARING", func(t *testing.T) {
+		previousStatus := valueobject.PREPARING.GetPreviousStatus()
+		expectedStatus := []valueobject.OrderStatus{valueobject.AWAITING_PREPARATION}
+
+		assert.Equal(t, expectedStatus, previousStatus)
+	})
+
+	t.Run("should return previous status for READY_TO_TAKEOUT", func(t *testing.T) {
+		previousStatus := valueobject.READY_TO_TAKEOUT.GetPreviousStatus()
+		expectedStatus := []valueobject.OrderStatus{valueobject.AWAITING_PREPARATION, valueobject.PREPARING}
+
+		assert.Equal(t, expectedStatus, previousStatus)
+	})
+
+	t.Run("should return previous status for COMPLETED", func(t *testing.T) {
+		previousStatus := valueobject.COMPLETED.GetPreviousStatus()
+		expectedStatus := []valueobject.OrderStatus{valueobject.AWAITING_PREPARATION, valueobject.PREPARING, valueobject.READY_TO_TAKEOUT}
+
+		assert.Equal(t, expectedStatus, previousStatus)
+	})
+
+	t.Run("should return empty previous status for unknown status", func(t *testing.T) {
+		unknownStatus := valueobject.OrderStatus("UNKNOWN")
+		previousStatus := unknownStatus.GetPreviousStatus()
+
+		assert.Empty(t, previousStatus)
+	})
+}
+
+func TestIsValidNextStatus(t *testing.T) {
+	t.Run("should return true when next status is valid", func(t *testing.T) {
+		currentStatus := valueobject.OrderStatus("AWAITING_PREPARATION")
+		nextStatus := "PREPARING"
+
+		result := currentStatus.IsValidNextStatus(nextStatus)
+
+		assert.True(t, result)
+	})
+
+	t.Run("should return false when next status is not valid", func(t *testing.T) {
+		currentStatus := valueobject.OrderStatus("AWAITING_PREPARATION")
+		nextStatus := "COMPLETED"
+
+		result := currentStatus.IsValidNextStatus(nextStatus)
+
+		assert.False(t, result)
+	})
+
+	t.Run("should return false when next status is the same as current status", func(t *testing.T) {
+		currentStatus := valueobject.OrderStatus("PREPARING")
+		nextStatus := "PREPARING"
+
+		result := currentStatus.IsValidNextStatus(nextStatus)
+
+		assert.False(t, result)
+	})
+
+	t.Run("should return false when next status cannot be parsed", func(t *testing.T) {
+		currentStatus := valueobject.OrderStatus("AWAITING_PREPARATION")
+		nextStatus := "INVALID_STATUS"
+
+		result := currentStatus.IsValidNextStatus(nextStatus)
+
+		assert.False(t, result)
+	})
+
+}
+
 func TestOrderStatusAsString(t *testing.T) {
-	result := orderStatus.AWAITING_PREPARATION.String()
+	result := valueobject.AWAITING_PREPARATION.String()
 
 	assert.Equal(t, "AWAITING_PREPARATION", result)
 }
