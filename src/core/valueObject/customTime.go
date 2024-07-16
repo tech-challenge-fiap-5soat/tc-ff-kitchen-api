@@ -22,13 +22,13 @@ func (ct *CustomTime) UnmarshalJSON(b []byte) (err error) {
 	return
 }
 
+func (ct *CustomTime) IsSet() bool {
+	return !ct.IsZero()
+}
+
 func (ct *CustomTime) MarshalJSON() ([]byte, error) {
 	if ct.Time.IsZero() {
 		return []byte("null"), nil
 	}
 	return []byte(fmt.Sprintf("\"%s\"", ct.Time.Format(ctLayout))), nil
-}
-
-func (ct *CustomTime) IsSet() bool {
-	return !ct.IsZero()
 }
