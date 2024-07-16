@@ -72,4 +72,4 @@ jobs:
           -Dsonar.organization=tech-challenge-fiap-5soat
           -Dsonar.projectKey=tech-challenge-fiap-5soat_tc-ff-kitchen-api
           -Dsonar.go.coverage.reportPaths=coverage/coverage.out
-          -Dsonar.go.tests.reportPaths=/github/workspace/coverage/test.out
+          -Dsonar.go.tests.reportPaths=/github/workspace/coverage/coverage.out
