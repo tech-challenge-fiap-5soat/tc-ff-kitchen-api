@@ -9,6 +9,7 @@ import (
 
 func TestCategory(t *testing.T) {
 	t.Run("should return true when category is Lanche", func(t *testing.T) {
+
 		isValid := vo.Category("Lanche").IsValid()
 
 		assert.True(t, isValid)

@@ -10,6 +10,7 @@ import (
 
 func TestCustomTime_UnmarshalJSON(t *testing.T) {
 	t.Run("Valid JSON String", func(t *testing.T) {
+
 		inputJSON := []byte(`"2024-01-20 21:16:09"`)
 		expectedTime, _ := time.Parse(time.DateTime, "2024-01-20 21:16:09")
 

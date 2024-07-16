@@ -9,6 +9,7 @@ import (
 
 func TestEmail(t *testing.T) {
 	t.Run("should return true when email is valid", func(t *testing.T) {
+
 		email := Email("test@gmail.com")
 
 		assert.True(t, email.IsValid())
