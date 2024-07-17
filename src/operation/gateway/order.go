@@ -9,18 +9,18 @@ import (
 	valueobject "github.com/tech-challenge-fiap-5soat/tc-ff-kitchen-api/src/core/valueObject"
 )
 
-type orderGateway struct {
-	datasource interfaces.DatabaseSource
-	orderApi   interfaces.OrderApi
+type OrderGateway struct {
+	Datasource interfaces.DatabaseSource
+	OrderApi   interfaces.OrderApi
 }
 
 func NewOrderGateway(datasource interfaces.DatabaseSource,
 	orderApi interfaces.OrderApi) interfaces.OrderGateway {
-	return &orderGateway{datasource: datasource, orderApi: orderApi}
+	return &OrderGateway{Datasource: datasource, OrderApi: orderApi}
 }
 
-func (og *orderGateway) FindAll() ([]entity.Order, error) {
-	orders, err := og.datasource.FindAll("", "")
+func (og *OrderGateway) FindAll() ([]entity.Order, error) {
+	orders, err := og.Datasource.FindAll("", "")
 
 	if err != nil {
 		return nil, err
@@ -35,8 +35,8 @@ func (og *orderGateway) FindAll() ([]entity.Order, error) {
 	return foundOrders, nil
 }
 
-func (og *orderGateway) FindById(id string) (*entity.Order, error) {
-	order, err := og.datasource.FindOne("_id", id)
+func (og *OrderGateway) FindById(id string) (*entity.Order, error) {
+	order, err := og.Datasource.FindOne("_id", id)
 
 	if err != nil {
 		return nil, err
@@ -50,8 +50,8 @@ func (og *orderGateway) FindById(id string) (*entity.Order, error) {
 	return foundOrder, nil
 }
 
-func (og *orderGateway) FindAllByStatus(status valueobject.OrderStatus) ([]entity.Order, error) {
-	orders, err := og.datasource.FindAll("orderStatus", string(status))
+func (og *OrderGateway) FindAllByStatus(status valueobject.OrderStatus) ([]entity.Order, error) {
+	orders, err := og.Datasource.FindAll("orderStatus", string(status))
 
 	if err != nil {
 		return nil, err
@@ -66,8 +66,8 @@ func (og *orderGateway) FindAllByStatus(status valueobject.OrderStatus) ([]entit
 	return foundOrders, nil
 }
 
-func (og *orderGateway) Save(order *entity.Order) (string, error) {
-	insertResult, err := og.datasource.Save(
+func (og *OrderGateway) Save(order *entity.Order) (string, error) {
+	insertResult, err := og.Datasource.Save(
 		dto.OrderEntityToSaveRecordDTO(order),
 	)
 
@@ -78,8 +78,8 @@ func (og *orderGateway) Save(order *entity.Order) (string, error) {
 	return orderInserted, nil
 }
 
-func (og *orderGateway) Update(order *entity.Order) error {
-	_, err := og.datasource.Update(
+func (og *OrderGateway) Update(order *entity.Order) error {
+	_, err := og.Datasource.Update(
 		order.ID,
 		dto.OrderEntityToUpdateRecordDTO(order),
 	)
@@ -90,7 +90,7 @@ func (og *orderGateway) Update(order *entity.Order) error {
 	return nil
 }
 
-func (og *orderGateway) ReleaseOrder(orderId string) error {
+func (og *OrderGateway) ReleaseOrder(orderId string) error {
 	order, err := og.FindById(orderId)
 
 	if err != nil {
@@ -105,7 +105,7 @@ func (og *orderGateway) ReleaseOrder(orderId string) error {
 		return fmt.Errorf("order cannot be released cause status is %s", order.OrderStatus.String())
 	}
 
-	err = og.orderApi.ReleaseOrder(orderId)
+	err = og.OrderApi.ReleaseOrder(orderId)
 
 	if err != nil {
 		return err
@@ -113,7 +113,7 @@ func (og *orderGateway) ReleaseOrder(orderId string) error {
 	return nil
 }
 
-func (og *orderGateway) FinishOrder(orderId string) error {
+func (og *OrderGateway) FinishOrder(orderId string) error {
 	order, err := og.FindById(orderId)
 
 	if err != nil {
@@ -128,7 +128,7 @@ func (og *orderGateway) FinishOrder(orderId string) error {
 		return fmt.Errorf("order cannot be finished cause status is %s", order.OrderStatus.String())
 	}
 
-	err = og.orderApi.FinishOrder(orderId)
+	err = og.OrderApi.FinishOrder(orderId)
 
 	if err != nil {
 		return err
