@@ -2,6 +2,8 @@
 
 To solve a problem of a neighborhood fastfood, a system was created to manage the fastfood, where it is possible to register users, products, create orders and make payments, in addition to the system being resilient to failures and scalable.
 
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=tech-challenge-fiap-5soat_tc-ff-kitchen-api)](https://sonarcloud.io/summary/new_code?id=tech-challenge-fiap-5soat_tc-ff-kitchen-api)
+
 
 ### Tech
 
