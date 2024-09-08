@@ -1,8 +1,10 @@
 package gateway
 
 import (
+	"encoding/json"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/tech-challenge-fiap-5soat/tc-ff-kitchen-api/src/common/dto"
 	"github.com/tech-challenge-fiap-5soat/tc-ff-kitchen-api/src/common/interfaces"
 	"github.com/tech-challenge-fiap-5soat/tc-ff-kitchen-api/src/core/entity"
@@ -10,13 +12,14 @@ import (
 )
 
 type OrderGateway struct {
-	Datasource interfaces.DatabaseSource
-	OrderApi   interfaces.OrderApi
+	Datasource       interfaces.DatabaseSource
+	OrderApi         interfaces.OrderApi
+	PublisherGateway PublisherGateway
 }
 
 func NewOrderGateway(datasource interfaces.DatabaseSource,
-	orderApi interfaces.OrderApi) interfaces.OrderGateway {
-	return &OrderGateway{Datasource: datasource, OrderApi: orderApi}
+	orderApi interfaces.OrderApi, publisherGateway PublisherGateway) interfaces.OrderGateway {
+	return &OrderGateway{Datasource: datasource, OrderApi: orderApi, PublisherGateway: publisherGateway}
 }
 
 func (og *OrderGateway) FindAll() ([]entity.Order, error) {
@@ -105,7 +108,7 @@ func (og *OrderGateway) ReleaseOrder(orderId string) error {
 		return fmt.Errorf("order cannot be released cause status is %s", order.OrderStatus.String())
 	}
 
-	err = og.OrderApi.ReleaseOrder(orderId)
+	err = og.PublishEvent(order)
 
 	if err != nil {
 		return err
@@ -128,8 +131,29 @@ func (og *OrderGateway) FinishOrder(orderId string) error {
 		return fmt.Errorf("order cannot be finished cause status is %s", order.OrderStatus.String())
 	}
 
-	err = og.OrderApi.FinishOrder(orderId)
+	err = og.PublishEvent(order)
 
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (og *OrderGateway) PublishEvent(order *entity.Order) error {
+
+	event := entity.OrderEvent{
+		Id:          uuid.New().String(),
+		EventType:   order.OrderStatus.String(),
+		OrderStatus: string(order.OrderStatus),
+		Order:       order,
+	}
+
+	jsonData, err := json.Marshal(event)
+	if err != nil {
+		return fmt.Errorf("error occurred while encoding order data: %s", err.Error())
+	}
+
+	err = og.PublisherGateway.PublishMessage(og.PublisherGateway.QueueUrl, string(jsonData))
 	if err != nil {
 		return err
 	}

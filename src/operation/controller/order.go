@@ -12,9 +12,9 @@ type OrderController struct {
 	useCase interfaces.OrderUseCase
 }
 
-func NewOrderController(datasource interfaces.DatabaseSource, orderApi interfaces.OrderApi) interfaces.OrderController {
+func NewOrderController(datasource interfaces.DatabaseSource, orderApi interfaces.OrderApi, publisher gateway.PublisherGateway) interfaces.OrderController {
 
-	gateway := gateway.NewOrderGateway(datasource, orderApi)
+	gateway := gateway.NewOrderGateway(datasource, orderApi, publisher)
 	return &OrderController{
 		useCase: usecase.NewOrderUseCase(gateway),
 	}
