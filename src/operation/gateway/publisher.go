@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/tech-challenge-fiap-5soat/tc-ff-kitchen-api/src/common/interfaces"
 )
 
 type PublisherGatewayConfig struct {
@@ -23,7 +24,7 @@ type PublisherGateway struct {
 	QueueUrl  string
 }
 
-func NewPublisherGateway(pgconfig PublisherGatewayConfig) PublisherGateway {
+func NewPublisherGateway(pgconfig PublisherGatewayConfig) interfaces.PublisherGateway {
 	var cfg aws.Config
 	var err error
 
@@ -57,11 +58,15 @@ func NewPublisherGateway(pgconfig PublisherGatewayConfig) PublisherGateway {
 
 	sqsClient := sqs.NewFromConfig(cfg)
 
-	publisher := PublisherGateway{
+	publisher := &PublisherGateway{
 		sqsClient: sqsClient,
 		QueueUrl:  pgconfig.SQSQueueUrl,
 	}
 	return publisher
+}
+
+func (pg *PublisherGateway) GetQueueUrl() string {
+	return pg.QueueUrl
 }
 
 func (pg *PublisherGateway) PublishMessage(queueName, message string) error {

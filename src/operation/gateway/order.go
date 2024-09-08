@@ -14,11 +14,11 @@ import (
 type OrderGateway struct {
 	Datasource       interfaces.DatabaseSource
 	OrderApi         interfaces.OrderApi
-	PublisherGateway PublisherGateway
+	PublisherGateway interfaces.PublisherGateway
 }
 
 func NewOrderGateway(datasource interfaces.DatabaseSource,
-	orderApi interfaces.OrderApi, publisherGateway PublisherGateway) interfaces.OrderGateway {
+	orderApi interfaces.OrderApi, publisherGateway interfaces.PublisherGateway) interfaces.OrderGateway {
 	return &OrderGateway{Datasource: datasource, OrderApi: orderApi, PublisherGateway: publisherGateway}
 }
 
@@ -153,7 +153,9 @@ func (og *OrderGateway) PublishEvent(order *entity.Order) error {
 		return fmt.Errorf("error occurred while encoding order data: %s", err.Error())
 	}
 
-	err = og.PublisherGateway.PublishMessage(og.PublisherGateway.QueueUrl, string(jsonData))
+	queueName := og.PublisherGateway.GetQueueUrl()
+	data := string(jsonData)
+	err = og.PublisherGateway.PublishMessage(queueName, data)
 	if err != nil {
 		return err
 	}
