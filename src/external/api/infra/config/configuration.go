@@ -19,8 +19,9 @@ var (
 )
 
 type Config struct {
-	MongoCfg MongoConfig `mapstructure:"mongodb"`
-	ApiCfg   Api         `mapstructure:"api"`
+	MongoCfg           MongoConfig     `mapstructure:"mongodb"`
+	ApiCfg             Api             `mapstructure:"api"`
+	QueueProcessorsCfg QueueProcessors `mapstructure:"QueueProcessors"`
 }
 
 type MongoConfig struct {
@@ -36,6 +37,15 @@ type Api struct {
 	AuthConfig           AuthConfig `mapstructure:"authconfig"`
 	AuthorizationBaseUrl string     `mapstructure:"authorizationurl"`
 	OrderApiBaseURL      string     `mapstructure:"orderApiBaseURL"`
+}
+
+type QueueProcessors struct {
+	OrderEventsQueue           string `mapstructure:"orderEventsQueue"`
+	OrderEventsQueueEndpoint   string `mapstructure:"orderEventsQueueEndpoint"`
+	OrderEventsQueueRegion     string `mapstructure:"orderEventsQueueRegion"`
+	KitchenEventsQueue         string `mapstructure:"kitchenEventsQueue"`
+	KitchenEventsQueueEndpoint string `mapstructure:"kitchenEventsQueueEndpoint"`
+	KitchenEventsQueueRegion   string `mapstructure:"kitchenEventsQueueRegion"`
 }
 
 type AuthConfig struct {
@@ -54,6 +64,10 @@ func GetMongoCfg() MongoConfig {
 
 func GetApiCfg() Api {
 	return config.ApiCfg
+}
+
+func GetQueueProcessorsCfg() QueueProcessors {
+	return config.QueueProcessorsCfg
 }
 
 func setupConfig() *Config {

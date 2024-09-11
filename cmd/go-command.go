@@ -30,6 +30,8 @@ func main() {
 		}
 	}()
 
+	config.InitProcessors(mongoClient)
+
 	gServer := gin.New()
 	api.Run(gServer, mongoClient)
 }

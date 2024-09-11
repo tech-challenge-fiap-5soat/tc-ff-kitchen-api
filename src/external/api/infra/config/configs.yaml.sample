@@ -11,3 +11,10 @@ api:
    clientId:   "cid"
    tokenUse:   "access"
   authorizationUrl: "https://apigateway.com/default/food-fiap-auth"
+QueueProcessors:
+  OrderEventsQueue: "OrderPreparationEvents"
+  OrderEventsQueueEndpoint: "http://localhost:4566" 
+  OrderEventsQueueRegion: "sa-east-1"
+  KitchenEventsQueue: "KitchenEvents"
+  KitchenEventsQueueEndpoint: "http://localhost:4566" 
+  KitchenEventsQueueRegion: "sa-east-1"

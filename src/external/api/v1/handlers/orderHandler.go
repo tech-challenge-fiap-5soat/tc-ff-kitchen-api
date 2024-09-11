@@ -26,9 +26,39 @@ func NewOrderHandler(gRouter *gin.RouterGroup, interactor interfaces.OrderContro
 		interactor: interactor,
 	}
 
+	gRouter.GET("/order/:id", handler.FindByIdHandler)
 	gRouter.POST("/prepare-order", handler.PrepareOrderHandler)
 	gRouter.PUT("/order/:id", handler.UpdateOrderHandler)
 	gRouter.PUT("/order/:id/status/:status", handler.UpdateStatusOrderHandler)
+}
+
+// Get Order godoc
+// @Summary Get order by ID
+// @Description Get order by ID
+// @Tags Order Routes
+// @Param        id   path      string  true  "Order ID"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} entity.Order{}
+// @Router /api/v1/order/{id} [get]
+func (handler *orderHandler) FindByIdHandler(c *gin.Context) {
+	orderId, exists := c.Params.Get("id")
+	var order *entity.Order // Only to swaggo doc
+
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "order id is required"})
+		return
+	}
+
+	result, err := handler.interactor.FindById(orderId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	order = result
+
+	c.JSON(http.StatusOK, order)
 }
 
 // Create Order godoc

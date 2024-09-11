@@ -81,48 +81,58 @@ func TestOrderGateway_FindAllByStatus(t *testing.T) {
 func TestOrderGateway_ReleaseOrder(t *testing.T) {
 	mockDatasource := mocks.NewMockDatabaseSource(t)
 	mockOrderApi := mocks.NewMockOrderApi(t)
+	mockPublisherGateway := mocks.NewMockPublisherGateway(t)
+	// mockOrderGateway := mocks.NewMockOrderGateway(t)
+	orderId := "1"
+	queueName := "my-queue"
 
 	order := &entity.Order{
-		ID:          "1",
+		ID:          orderId,
 		Amount:      10,
 		OrderStatus: valueobject.OrderStatus("READY_TO_TAKEOUT"),
 	}
-	mockDatasource.On("FindOne", "_id", "1").Return(order, nil)
-	mockOrderApi.On("ReleaseOrder", "1").Return(nil)
+
+	mockDatasource.On("FindOne", "_id", orderId).Return(order, nil)
+	mockPublisherGateway.On("GetQueueUrl").Return(queueName)
+	mockPublisherGateway.On("PublishMessage", mock.Anything, mock.Anything).Return(nil)
 
 	og := &gateway.OrderGateway{
-		Datasource: mockDatasource,
-		OrderApi:   mockOrderApi,
+		Datasource:       mockDatasource,
+		OrderApi:         mockOrderApi,
+		PublisherGateway: mockPublisherGateway,
 	}
 
-	err := og.ReleaseOrder("1")
+	err := og.ReleaseOrder(orderId)
 
 	assert.NoError(t, err)
-
 	mockDatasource.AssertExpectations(t)
-	mockOrderApi.AssertExpectations(t)
+	mockPublisherGateway.AssertExpectations(t)
 }
 func TestOrderGateway_FinishOrder(t *testing.T) {
 	mockDatasource := mocks.NewMockDatabaseSource(t)
 	mockOrderApi := mocks.NewMockOrderApi(t)
+	mockPublisherGateway := mocks.NewMockPublisherGateway(t)
+	queueName := "my-queue"
+	orderId := "1"
 
 	order := &entity.Order{
-		ID:          "1",
+		ID:          orderId,
 		Amount:      10,
 		OrderStatus: valueobject.OrderStatus("COMPLETED"),
 	}
-	mockDatasource.On("FindOne", "_id", "1").Return(order, nil)
-	mockOrderApi.On("FinishOrder", "1").Return(nil)
+	mockDatasource.On("FindOne", "_id", orderId).Return(order, nil)
+	mockPublisherGateway.On("GetQueueUrl").Return(queueName)
+	mockPublisherGateway.On("PublishMessage", mock.Anything, mock.Anything).Return(nil)
 
 	og := &gateway.OrderGateway{
-		Datasource: mockDatasource,
-		OrderApi:   mockOrderApi,
+		Datasource:       mockDatasource,
+		OrderApi:         mockOrderApi,
+		PublisherGateway: mockPublisherGateway,
 	}
 
-	err := og.FinishOrder("1")
+	err := og.FinishOrder(orderId)
 
 	assert.NoError(t, err)
-
 	mockDatasource.AssertExpectations(t)
-	mockOrderApi.AssertExpectations(t)
+	mockPublisherGateway.AssertExpectations(t)
 }
