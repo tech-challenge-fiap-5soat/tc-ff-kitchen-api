@@ -1,112 +1,124 @@
 # Fiap Tech Fast Food
 
-To solve a problem of a neighborhood fastfood, a system was created to manage the fastfood, where it is possible to register users, products, create orders and make payments, in addition to the system being resilient to failures and scalable.
+## Project Overview
+
+Fiap Tech Fast Food is a system designed to manage a neighborhood fast food restaurant. The system allows for user registration, product management, order creation, and payment processing. It is built to be resilient to failures and scalable.
+
+This service is responsible for
+- Managing the flow of orders in the kitchen
+- Controlling the preparation status of dishes
+- Coordinating the queue of orders for preparation
+- Notifying when orders are ready for pickup
+- Monitoring kitchen performance and efficiency
+
+The system is built to be fault resilient and scalable, allowing the kitchen to operate efficiently even during periods of high order volume.
+
+## Badges
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=tech-challenge-fiap-5soat_tc-ff-kitchen-api&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=tech-challenge-fiap-5soat_tc-ff-kitchen-api)
-
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=tech-challenge-fiap-5soat_tc-ff-kitchen-api&metric=bugs)](https://sonarcloud.io/summary/new_code?id=tech-challenge-fiap-5soat_tc-ff-kitchen-api)
-
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=tech-challenge-fiap-5soat_tc-ff-kitchen-api&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=tech-challenge-fiap-5soat_tc-ff-kitchen-api)
-
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=tech-challenge-fiap-5soat_tc-ff-kitchen-api&metric=coverage)](https://sonarcloud.io/summary/new_code?id=tech-challenge-fiap-5soat_tc-ff-kitchen-api)
-
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=tech-challenge-fiap-5soat_tc-ff-kitchen-api&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=tech-challenge-fiap-5soat_tc-ff-kitchen-api)
 
-### Tech
+## Technology Stack
 
-This api was built using [Golang](https://golang.org/) and some tools:
- * [gin](http://github.com/gin-gonic/gin) - Web framework 
- * [mongo-driver](http://go.mongodb.org/mongo-driver) - driver to deal with MongoDB
- * [viper](https://github.com/spf13/viper) - Config solution tool
- * [mockery](https://github.com/vektra/mockery) - Mock tool to use on unit tests
- * [swag](https://github.com/swaggo/swag) - Tool to generate swagger documentation
- * [docker](https://www.docker.com/) - Containerization tool
- * [docker-compose](https://docs.docker.com/compose/) - Tool to define and run multi-container Docker applications
- * [make](https://www.gnu.org/software/make/) - Tool to define and run tasks
- * [mermaid](https://mermaid-js.github.io/mermaid/#/) - Tool to create diagrams and flowcharts
- * [kubernetes](https://kubernetes.io/pt-br/) - Tool to automate deployment, scaling, and management of containerized applications
+This API was built using [Golang](https://golang.org/) and several tools:
+- [gin](http://github.com/gin-gonic/gin) - Web framework
+- [mongo-driver](http://go.mongodb.org/mongo-driver) - MongoDB driver
+- [viper](https://github.com/spf13/viper) - Configuration tool
+- [mockery](https://github.com/vektra/mockery) - Mocking tool for unit tests
+- [swag](https://github.com/swaggo/swag) - Swagger documentation generator
+- [docker](https://www.docker.com/) - Containerization tool
+- [docker-compose](https://docs.docker.com/compose/) - Multi-container Docker applications
+- [make](https://www.gnu.org/software/make/) - Task automation tool
+- [mermaid](https://mermaid-js.github.io/mermaid/#/) - Diagrams and flowcharts
+- [kubernetes](https://kubernetes.io/pt-br/) - Container orchestration
 
+## Architecture
 
-### Architecture
-Demonstration: https://youtu.be/K7y3UWxIGY8
-
-![arch-fiap-tech-food](https://github.com/tech-challenge-fiap-5soat/tc-ff-kitchen-api/assets/40570205/0e42bb30-6065-4ff1-92a0-99b6139f4995)
+For a demonstration of the architecture, visit: [Architecture Video](AWS_ACCESS_KEY_ID=test;AWS_SECRET_ACCESS_KEY=test)
 
 
-### Requests flow
-Based on postman collection request names, the requests flow is:
-```mermaid
-flowchart
-    subgraph Pre-requisitions
-        A[Create user *non required*] ~~~ B[Create product]
-    end
-```
-```mermaid
-flowchart LR
-    subgraph Complete Order Flow
-        C[Create Order] --> D[Create Checkout From Order]
-        D[Create Checkout From Order] --> E[Choose pay or not from checkout url]
-        E[Choose pay or not from checkout url] --> F[Update Order Status to *preparing*]
-        F[Update Order Status to *preparing*] --> G[Update Order Status to *ready*]
-        G[Update Order Status to *ready*] --> H[Update Order Status to *completed*]
-    end
-```
+## Running the Application
 
-## Run
+### Using Docker
 
-The app can be started using docker and you can use the actions pre-defineds on Makefile
+The app can be started using Docker. You can use the pre-defined actions in the Makefile.
 
-* ***Build image***
+#### Build Image
 
-To build an image from project to push to a registry you can use the command below:
+To build an image from the project to push to a registry, use the command below:
 
 ```sh
 make build-image
 ```
-this command will generate an image with this tag: *fiap-tech-fast-food*
 
-If you want run this image locally you can use this command: 
+This command will generate an image with the tag: `tc-ff-kitchen-api`.
 
-```sh
-docker run -e MONGODB_HOST=localhost -e MONGODB_PORT=27017 -e MONGODB_DATABASE=db -e API_PORT=8080 -p 8080:8080 -it fiap-tech-fast-food
-```
+#### Generate Documentation
 
-* ***Generate docs***
-
-To generate the documentation to publish on project like an openApi you can use the command below:
+To generate the documentation to publish on the project like an OpenAPI, use the command below:
 
 ```sh
 make serve-swagger
 ```
-this command will generate a directory called `docs` 
 
+This command will generate a directory called `docs`.
 
 ### Development
 
-To run in development for debug or improvement you can use another command:
+Before run the application, you need to export the variables below:
 
 ```sh
-make start-local-development
-``` 
+AWS_ACCESS_KEY_ID=test
+AWS_SECRET_ACCESS_KEY=test
+MONGODB_HOST=localhost
+MONGODB_PORT=27017
+MONGODB_DATABASE=db
+MONGODB_USER=root
+MONGODB_PASS=root
+```
 
-this command will start a container with hot-reload to any modification on the code. Including a container with an instance of MongoDB.
+To run in development for debugging or improvement, use the command:
 
-To stop the container execute:
+```sh
+make start-local-development &
+```
+
+And run that command in another terminal:
+
+```sh
+make run
+```
+
+This command will start a container with hot-reload for any code modifications, including a container with an instance of MongoDB.
+
+To stop the container, execute:
 
 ```sh
 make stop-local-development
 ```
 
-### Test
+### Testing
 
-Locally you can use the command below:
+Locally, you can use the command below:
 
 ```sh
 go test ./...  -v
 ```
 
-or use a make action: 
+Or use a make action:
 
 ```sh
-make test   
+make test
+```
+
+## Configuration
+
+Configuration settings are managed using environment variables and a configuration file. Refer to the `configs.yaml.sample` file for the required settings.
+
+```yaml:src/external/api/infra/config/configs.yaml.sample
+startLine: 1
+endLine: 20
 ```
