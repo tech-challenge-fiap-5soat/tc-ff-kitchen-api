@@ -37,8 +37,7 @@ This API was built using [Golang](https://golang.org/) and several tools:
 
 ## Architecture
 
-For a demonstration of the architecture, visit: [Architecture Video](AWS_ACCESS_KEY_ID=test;AWS_SECRET_ACCESS_KEY=test)
-
+For a demonstration of the architecture, visit: [Architecture Video](https://drive.google.com/file/d/1NheE489Ma2W28Jvz3ZzRNAWCeHTrwVbm/view?usp=sharing)
 
 ## Running the Application
 
@@ -71,13 +70,13 @@ This command will generate a directory called `docs`.
 Before run the application, you need to export the variables below:
 
 ```sh
-AWS_ACCESS_KEY_ID=test
-AWS_SECRET_ACCESS_KEY=test
-MONGODB_HOST=localhost
-MONGODB_PORT=27017
-MONGODB_DATABASE=db
-MONGODB_USER=root
-MONGODB_PASS=root
+export AWS_ACCESS_KEY_ID=test
+export AWS_SECRET_ACCESS_KEY=test
+export MONGODB_HOST=localhost
+export MONGODB_PORT=27017
+export MONGODB_DATABASE=db
+export MONGODB_USER=root
+export MONGODB_PASS=root
 ```
 
 To run in development for debugging or improvement, use the command:
